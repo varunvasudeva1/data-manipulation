@@ -1,0 +1,61 @@
+---
+title: "ICA 5"
+author: "Varun Vasudeva"
+date: "9/18/2020"
+output: html_document
+---
+
+```{r setup}
+library(tidyverse)
+data(diamonds)
+```
+
+## 1
+
+```{r}
+diamonds <- diamonds %>% 
+  mutate(clarityOrdered = ordered(ifelse((clarity == "SI1" | clarity == "SI2"), "SI", 
+                                      ifelse(clarity == "VS1" | clarity == "VS2", "VS", 
+                                             ifelse(clarity == "VVS1" | clarity == "VVS2", "VVS", as.character(clarity)))), 
+                                  levels = c("I1", "SI", "VS", "VVS", "IF")))
+
+head(diamonds)
+
+SIdiamonds <- filter(diamonds, clarityOrdered == "SI")
+meanCaratSI = mean(SIdiamonds$carat)
+
+VSdiamonds <- filter(diamonds, clarityOrdered == "VS")
+meanCaratVS = mean(VSdiamonds$carat)
+
+VVSdiamonds <- filter(diamonds, clarityOrdered == "VVS")
+meanCaratVVS = mean(VVSdiamonds$carat)
+
+I1diamonds <- filter(diamonds, clarityOrdered == "I1")
+meanCaratI1 = mean(I1diamonds$carat)
+
+IFdiamonds <- filter(diamonds, clarityOrdered == "IF")
+meanCaratIF = mean(IFdiamonds$carat)
+
+means <- data.frame(Type = c("SI", "VS", "VVS", "I1", "IF"), Mean = c(meanCaratSI, meanCaratVS, meanCaratVVS, meanCaratI1, meanCaratIF))
+means
+```
+
+## 2
+
+```{r, warning = FALSE}
+gdpdata <- read_csv("ND000334Q.csv")
+
+gdpdata <- gdpdata %>%
+  mutate(Year = format(as.Date(DATE, format="%d/%m/%Y"),"%Y"))
+
+gdpdata2 <- gdpdata %>% 
+  group_by(Year) %>% 
+  summarize(Mean = mean(ND000334Q))
+
+head(gdpdata2)
+
+ggplot(gdpdata2, aes(Year, Mean)) +
+  geom_point() +
+  geom_line() +
+  labs(title = "Annual Average GDP of the United States")
+```
